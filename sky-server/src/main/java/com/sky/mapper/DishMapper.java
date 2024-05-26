@@ -45,6 +45,7 @@ public interface DishMapper {
      * @param id
      */
     @Update("update dish set status = #{status} where id = #{id}")
+    @AutoFill(OperationType.UPDATE)
     void startOrStop(Integer status, Integer id);
 
     /**
@@ -52,4 +53,7 @@ public interface DishMapper {
      * @param ids
      */
     void deleteByIds(List<Long> ids);
+
+    @AutoFill(OperationType.UPDATE)
+    void update(Dish dish);
 }
