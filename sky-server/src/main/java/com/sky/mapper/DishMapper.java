@@ -24,11 +24,25 @@ public interface DishMapper {
     @Select("select count(id) from dish where category_id = #{categoryId}")
     Integer countByCategoryId(Long categoryId);
 
+    /**
+     * 新增菜品
+     * @param dish
+     */
     @AutoFill(OperationType.INSERT)
     void insert(Dish dish);
 
+    /**
+     * 菜品的分页查询
+     * @param dishPageQueryDTO
+     * @return
+     */
     Page<DishVO> queryPage(DishPageQueryDTO dishPageQueryDTO);
 
+    /**
+     * 根据id获取菜品数据
+     * @param id
+     * @return
+     */
     @Select("select * from dish where id = #{id}")
     Dish getById(Long id);
 
@@ -54,6 +68,10 @@ public interface DishMapper {
      */
     void deleteByIds(List<Long> ids);
 
+    /**
+     * 更新菜品数据
+     * @param dish
+     */
     @AutoFill(OperationType.UPDATE)
     void update(Dish dish);
 
