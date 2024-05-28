@@ -9,8 +9,11 @@ import com.sky.vo.SetmealVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/admin/setmeal")
 @RestController
@@ -67,5 +70,15 @@ public class SetmealController {
         log.info("根据id查询套餐：{}", id);
 
         return Result.success(setmealService.getById(id));
+    }
+
+    @DeleteMapping
+    @ApiOperation("批量删除套餐")
+    public Result deleteBatch(@RequestParam List<Long> ids) {
+        log.info("批量删除套餐：{}", ids);
+
+        setmealService.deleteBatch(ids);
+
+        return Result.success();
     }
 }

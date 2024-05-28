@@ -42,6 +42,13 @@
         </set>
         where id = #{id}
     </update>
+    <delete id="deleteBatch">
+        delete from setmeal
+        where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
     <select id="pageQuery" resultType="com.sky.entity.Setmeal">
         select s.*, c.name as categoryName
         from setmeal s left join category c on s.category_id = c.id
@@ -57,5 +64,12 @@
             </if>
         </where>
         order by create_time desc
+    </select>
+    <select id="getByIds" resultType="com.sky.entity.Setmeal">
+        select * from setmeal
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
     </select>
 </mapper>

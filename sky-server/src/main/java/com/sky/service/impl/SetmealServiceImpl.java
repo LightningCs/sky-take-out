@@ -83,6 +83,16 @@ public class SetmealServiceImpl implements SetmealService {
      */
     @Override
     public void startOrStop(Integer status, Long id) {
+        //判断套餐是否有停售菜品
+        List<Dish> dishes = setmealDishMapper.getDishesBySetmealId(id);
+
+        for (Dish dish : dishes) {
+            if (dish.getStatus() == 0) {
+                throw new RuntimeException(MessageConstant.SETMEAL_ENABLE_FAILED);
+            }
+        }
+
+        //修改起售停售状态
         Setmeal setmeal = new Setmeal().builder()
                         .id(id)
                         .status(status).build();
@@ -111,6 +121,11 @@ public class SetmealServiceImpl implements SetmealService {
         setmealDishMapper.insertBatch(setmealDishes);
     }
 
+    /**
+     * 根据id获取套餐数据
+     * @param id
+     * @return
+     */
     @Override
     public SetmealVO getById(Long id) {
         SetmealVO setmealVO = setmealMapper.getById(id);
@@ -118,5 +133,28 @@ public class SetmealServiceImpl implements SetmealService {
         setmealVO.setSetmealDishes(dishes);
 
         return setmealVO;
+    }
+
+    /**
+     * 批量删除套餐
+     * @param ids
+     */
+    @Override
+    @Transactional
+    public void deleteBatch(List<Long> ids) {
+        //判断套餐是否处于起售状态
+        List<Setmeal> setmeals = setmealMapper.getByIds(ids);
+
+        for (Setmeal setmeal : setmeals) {
+            if (setmeal.getStatus() == 1) {
+                throw new RuntimeException(MessageConstant.SETMEAL_ON_SALE);
+            }
+        }
+
+        //批量删除套餐数据
+        setmealMapper.deleteBatch(ids);
+
+        //批量删除套餐菜品关系数据
+        setmealDishMapper.deleteBatch(ids);
     }
 }

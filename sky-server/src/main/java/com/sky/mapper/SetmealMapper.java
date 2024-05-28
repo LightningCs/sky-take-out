@@ -53,4 +53,17 @@ public interface SetmealMapper {
      */
     @Select("select s.*, c.name as category_id from setmeal s left join category c on s.category_id = c.id where s.id = #{id}")
     SetmealVO getById(Long id);
+
+    /**
+     * 批量删除套餐
+     * @param ids
+     */
+    void deleteBatch(List<Long> ids);
+
+    /**
+     * 批量查询
+     * @param ids
+     * @return
+     */
+    List<Setmeal> getByIds(List<Long> ids);
 }
