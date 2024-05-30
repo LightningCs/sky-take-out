@@ -55,12 +55,11 @@ public interface DishMapper {
 
     /**
      * 起售禁售菜品
-     * @param status
-     * @param id
+     * @param dish
      */
-    @Update("update dish set status = #{status} where id = #{id}")
+    @Update("update dish set status = #{status}, update_time = #{updateTime}, update_user = #{updateUser} where id = #{id}")
     @AutoFill(OperationType.UPDATE)
-    void startOrStop(Integer status, Integer id);
+    void startOrStop(Dish dish);
 
     /**
      * 根据菜品id批量删除数据
