@@ -25,9 +25,10 @@ public class ShoppingCartController {
     @PostMapping("/add")
     @ApiOperation("添加购物车")
     @CacheEvict(value = "shoppingCart", allEntries = true)
-    public Result save(@RequestBody ShoppingCartDTO shoppingCartDTO) {
+    public Result addShoppingCart(@RequestBody ShoppingCartDTO shoppingCartDTO) {
+        log.info("添加购物车，{}", shoppingCartDTO);
 
-        shoppingCartService.save(shoppingCartDTO);
+        shoppingCartService.addShoppingCart(shoppingCartDTO);
 
         return Result.success();
     }
