@@ -41,5 +41,26 @@
         </set>
         where id = #{id}
     </update>
+    <select id="searchOrders" resultType="com.sky.entity.Orders"
+            parameterType="com.sky.dto.OrdersPageQueryDTO">
+        select * from orders
+        <where>
+            <if test="number != null">
+                and number = #{number}
+            </if>
+            <if test="phone != null">
+                and phone = #{phone}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="beginTime != null">
+                and order_time >= #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and #{endTime} >= delivery_time
+            </if>
+        </where>
+    </select>
 
 </mapper>
