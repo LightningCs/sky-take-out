@@ -267,6 +267,7 @@ public class OrderServiceImpl implements OrderService {
     public void confirm(OrdersConfirmDTO ordersConfirmDTO) {
         Orders orders = Orders.builder()
                 .id(ordersConfirmDTO.getId())
+                .estimatedDeliveryTime(LocalDateTime.now().minusMinutes(-30))
                 .status(Orders.CONFIRMED)
                 .build();
         orderMapper.update(orders);
@@ -292,7 +293,8 @@ public class OrderServiceImpl implements OrderService {
                 .id(ordersRejectionDTO.getId())
                 .rejectionReason(ordersRejectionDTO.getRejectionReason())
                 .status(Orders.CANCELLED)
-                .cancelTime(LocalDateTime.now()).build();
+                .cancelTime(LocalDateTime.now())
+                .build();
         orderMapper.update(orders);
     }
 
@@ -329,7 +331,22 @@ public class OrderServiceImpl implements OrderService {
                 .id(ordersCancelDTO.getId())
                 .status(Orders.CANCELLED)
                 .cancelReason(ordersCancelDTO.getCancelReason())
-                .cancelTime(LocalDateTime.now()).build();
+                .cancelTime(LocalDateTime.now())
+                .build();
+        orderMapper.update(orders);
+    }
+
+    /**
+     * 取消订单——id
+     * @param id
+     */
+    @Override
+    public void cancel(Long id) {
+        Orders orders = Orders.builder()
+                .id(id)
+                .status(Orders.CANCELLED)
+                .cancelTime(LocalDateTime.now())
+                .build();
         orderMapper.update(orders);
     }
 
@@ -349,7 +366,8 @@ public class OrderServiceImpl implements OrderService {
 
         Orders orders = Orders.builder()
                 .id(id)
-                .status(Orders.DELIVERY_IN_PROGRESS).build();
+                .status(Orders.DELIVERY_IN_PROGRESS)
+                .build();
 
         orderMapper.update(orders);
     }
@@ -371,5 +389,75 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDetail> list = orderDetailMapper.getByOrderId(id);
         orderVO.setOrderDetailList(list);
         return orderVO;
+    }
+
+    /**
+     * 查询订单详情
+     * @param id
+     * @return
+     */
+    @Override
+    public OrderVO getOrderDetail(Long id) {
+
+        Orders order = orderMapper.getById(id);
+        List<OrderDetail> list = orderDetailMapper.getByOrderId(id);
+
+        OrderVO orderVO = new OrderVO();
+        BeanUtils.copyProperties(order, orderVO);
+        orderVO.setOrderDetailList(list);
+
+        return orderVO;
+    }
+
+    /**
+     * 历史订单查询
+     * @param ordersPageQueryDTO
+     * @return
+     */
+    @Override
+    public PageResult getHistoryOrders(OrdersPageQueryDTO ordersPageQueryDTO) {
+        //开启分页插叙
+        PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
+
+        //订单状态
+        Integer status = ordersPageQueryDTO.getStatus();
+
+        Page<OrderVO> page = orderMapper.getByStatus(status);
+
+        //订单集合
+        List<OrderVO> result = page.getResult();
+        //获取所有订单各自的订单详情
+        result.forEach(item -> {
+            List<OrderDetail> details = orderDetailMapper.getByOrderId(item.getId());
+            item.setOrderDetailList(details);
+        });
+
+        return new PageResult(page.getTotal(), result);
+    }
+
+    /**
+     * 再来一单
+     * @param id
+     */
+    @Override
+    public void repetition(Long id) {
+        //获取对应id的订单数据
+        Orders orders = orderMapper.getById(id);
+        orders.setNumber(String.valueOf(System.currentTimeMillis()));
+        orders.setStatus(Orders.PENDING_PAYMENT);
+        orders.setOrderTime(LocalDateTime.now());
+        orders.setCheckoutTime(null);
+        orders.setCancelReason(null);
+        orders.setRejectionReason(null);
+        orders.setCancelTime(null);
+        orders.setEstimatedDeliveryTime(null);
+        orders.setDeliveryTime(null);
+
+        //获取对应订单id的订单详情
+        List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
+
+        //再来一单
+        orderMapper.insert(orders);
+        orderDetailMapper.insertBatch(orderDetailList);
     }
 }

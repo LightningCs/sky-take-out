@@ -63,6 +63,12 @@ public interface OrderService {
     void cancel(OrdersCancelDTO ordersCancelDTO);
 
     /**
+     * 取消订单——id
+     * @param id
+     */
+    void cancel(Long id);
+
+    /**
      * 派送订单
      * @param id
      */
@@ -74,4 +80,20 @@ public interface OrderService {
      * @return
      */
     OrderVO details(Long id);
+
+    /**
+     * 查询订单详情
+     * @param id
+     * @return
+     */
+    OrderVO getOrderDetail(Long id);
+
+    /**
+     * 历史订单查询
+     * @param ordersPageQueryDTO
+     * @return
+     */
+    PageResult getHistoryOrders(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    void repetition(Long id);
 }

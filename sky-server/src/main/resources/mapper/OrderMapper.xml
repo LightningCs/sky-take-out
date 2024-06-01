@@ -62,5 +62,13 @@
             </if>
         </where>
     </select>
+    <select id="getByStatus" resultType="com.sky.vo.OrderVO">
+        select * from orders
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
 
 </mapper>

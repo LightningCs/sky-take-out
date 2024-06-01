@@ -7,6 +7,7 @@ import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersRejectionDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderStatisticsVO;
+import com.sky.vo.OrderVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -53,4 +54,11 @@ public interface OrderMapper {
      */
     @Select("select * from orders where id = #{id}")
     Orders getById(Long id);
+
+    /**
+     * 查询订单历史
+     * @param status
+     * @return
+     */
+    Page<OrderVO> getByStatus(Integer status);
 }
