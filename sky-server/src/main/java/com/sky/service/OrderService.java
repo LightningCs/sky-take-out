@@ -95,5 +95,15 @@ public interface OrderService {
      */
     PageResult getHistoryOrders(OrdersPageQueryDTO ordersPageQueryDTO);
 
+    /**
+     * 再来一单
+     * @param id
+     */
     void repetition(Long id);
+
+    /**
+     * 催单
+     * @param id
+     */
+    void reminder(Long id);
 }

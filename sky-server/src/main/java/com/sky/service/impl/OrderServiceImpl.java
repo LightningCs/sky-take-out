@@ -204,6 +204,28 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 催单
+     *
+     * @param id
+     */
+    @Override
+    public void reminder(Long id) {
+        Orders order = orderMapper.getById(id);
+
+        if (order == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        //通过websocket向客户端浏览器推送消息 type orderId content
+        Map map = new HashMap();
+        map.put("type", 2); // 1表示来单提醒，2表示客户催单
+        map.put("orderId", order.getId());
+        map.put("content", "订单号：" + order.getNumber());
+
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
+    }
+
+    /**
      * 订单搜索
      * @param pageQueryDTO
      * @return
