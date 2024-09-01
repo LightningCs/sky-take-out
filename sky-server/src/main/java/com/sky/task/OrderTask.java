@@ -22,9 +22,6 @@ public class OrderTask {
     @Autowired
     private OrderMapper orderMapper;
 
-    @Autowired
-    private OrderDetailMapper orderDetailMapper;
-
     /**
      * 处理超时订单
      */
@@ -51,7 +48,7 @@ public class OrderTask {
      * 处理一直处于配送中的订单
      */
 //    @Scheduled(cron = "0/5 * * * * ?")
-    @Scheduled(cron = "0 0 1 * * ? *")//每天凌晨一点
+    @Scheduled(cron = "0 0 1 * * ?")//每天凌晨一点
     public void processDeliveryOrder() {
         log.info("处理一直处于配送中的订单，{}", LocalDateTime.now());
 
