@@ -70,5 +70,18 @@
             </if>
         </where>
     </select>
-
+    <select id="getTurnoversBYDates" resultType="java.lang.Double"
+            parameterType="java.util.List">
+        select ifnull(sum(amount), 0) as 'turnover'
+        from (
+            <foreach collection="dateList" item="date" separator=" " close="select null as order_time">
+                select #{date} as `order_time`
+                UNION ALL
+            </foreach>
+             ) as o1 left join orders o2
+        on o1.order_time = DATE(o2.order_time) and o2.status = 5
+        where o1.order_time != 'null'
+        group by o1.order_time
+        order by o1.order_time
+    </select>
 </mapper>
