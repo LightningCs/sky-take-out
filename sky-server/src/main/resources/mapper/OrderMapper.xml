@@ -78,10 +78,10 @@
                 select #{date} as `order_time`
                 UNION ALL
             </foreach>
-             ) as o1 left join orders o2
-        on o1.order_time = DATE(o2.order_time) and o2.status = 5
-        where o1.order_time != 'null'
-        group by o1.order_time
-        order by o1.order_time
+             ) as t1 left join orders t2
+        on t1.order_time = DATE(t2.order_time) and t2.status = 5
+        where t1.order_time != 'null'
+        group by t1.order_time
+        order by t1.order_time
     </select>
 </mapper>

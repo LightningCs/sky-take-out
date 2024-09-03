@@ -7,4 +7,25 @@
         insert into user(openid, name, phone, sex, id_number, avatar, create_time)
         values (#{openid}, #{name}, #{phone}, #{sex}, #{idNumber}, #{avatar}, #{createTime})
     </insert>
+    <select id="getTotalUserList" resultType="java.lang.Integer"
+            parameterType="java.util.List">
+        select count(*) as `users` from (
+            <foreach collection="dateTimeList" item="dateTime" close="select null time" separator=" ">
+                select #{dateTime} time
+                union all
+            </foreach>) t1 left join user t2 on t2.create_time &lt;= t1.time
+        where t1.time != 'null'
+        group by t1.time
+    </select>
+
+    <select id="getNewUserList" resultType="java.lang.Integer"
+            parameterType="java.util.List">
+        select if(t2.create_time is null, 0, count(*)) as `users` from (
+        <foreach collection="dateList" item="date" close="select null time" separator=" ">
+            select #{date} time
+            union all
+        </foreach>) t1 left join user t2 on DATE(t2.create_time) = t1.time
+        where t1.time != 'null'
+        group by t1.time
+    </select>
 </mapper>
