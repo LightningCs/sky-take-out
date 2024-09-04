@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Select;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface OrderMapper {
@@ -91,9 +92,13 @@ public interface OrderMapper {
      * 获取top10
      * @param begin
      * @param end
-     * @param name
      * @return
      */
     @Select("select t2.name, sum(t2.number) as `number` from orders t1 left join order_detail t2 on t1.id = t2.order_id where DATE(t1.order_time) >= #{begin} and DATE(t1.order_time) <= #{end} and status = 5 group by t2.name order by number desc limit 0, 10")
     List<GoodsSalesDTO> getTop10Goods(LocalDate begin, LocalDate end);
+
+    Integer countByMap(Map map);
+
+    @Select("select sum(amount) as `sum` from orders where order_time >= #{begin} and order_time <= #{end} and status = #{status}")
+    Double sumByMap(Map map);
 }

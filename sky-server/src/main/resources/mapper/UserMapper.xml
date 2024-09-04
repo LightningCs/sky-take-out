@@ -28,4 +28,8 @@
         where t1.time != 'null'
         group by t1.time
     </select>
+    <select id="countByMap" resultType="java.lang.Integer">
+        select count(id) from user
+        where create_time >= #{begin} and create_time &lt;= #{end}
+    </select>
 </mapper>
