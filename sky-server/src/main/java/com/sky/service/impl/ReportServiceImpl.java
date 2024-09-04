@@ -1,8 +1,10 @@
 package com.sky.service.impl;
 
+import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -39,12 +41,10 @@ public class ReportServiceImpl implements ReportService{
         List<LocalDate> dateList = new ArrayList<>();
 
         // 日期计算
-        for (long i = 0; !begin.plusDays(i - 1).equals(end); i++) {
-            dateList.add(begin.plusDays(i));
-        }
+        compute(begin, end, dateList);
 
         // 营业额统计
-        List<Double> turnoverList = orderMapper.getTurnoversBYDates(dateList);
+        List<Double> turnoverList = orderMapper.getTurnoversByDates(dateList);
 
         return TurnoverReportVO.builder()
                 .dateList(StringUtils.join(dateList, ','))
@@ -64,9 +64,7 @@ public class ReportServiceImpl implements ReportService{
         List<LocalDate> dateList = new ArrayList<>();
 
         //日期计算
-        for (long i = 0; !begin.plusDays(i - 1).equals(end); i++) {
-            dateList.add(begin.plusDays(i));
-        }
+        compute(begin, end, dateList);
 
         List<LocalDateTime> dateTimeList = dateList.stream()
                 .map(date -> LocalDateTime.of(date, LocalTime.MAX))
@@ -83,5 +81,51 @@ public class ReportServiceImpl implements ReportService{
                 .totalUserList(StringUtils.join(userList, ','))
                 .newUserList(StringUtils.join(newUserList, ','))
                 .build();
+    }
+
+
+    @Override
+    public OrderReportVO getOrderStatistics(LocalDate begin, LocalDate end) {
+        List<LocalDate> dateList = new ArrayList<>();
+
+        //日期计算
+        compute(begin, end, dateList);
+
+        //每日订单总数 select * from orders where Date(order_time) = date
+        List<Integer> orderCountList = orderMapper.getOrderEverydayCount(dateList);
+
+        //每日有效订单总数 select * from orders where status = 5 and Date(order_time) = date
+        List<Integer> validOrderCountList = orderMapper.getOrderEverydayCount(dateList, Orders.COMPLETED);
+
+        Integer totalOrderCount = getAll(orderCountList);
+
+        Integer validOrderCount = getAll(validOrderCountList);
+
+        //订单完成率
+        Double orderCompletionRate = validOrderCount.doubleValue() / totalOrderCount;
+
+        return OrderReportVO.builder()
+                .dateList(StringUtils.join(dateList, ','))
+                .orderCountList(StringUtils.join(orderCountList, ','))
+                .validOrderCountList(StringUtils.join(validOrderCountList, ','))
+                .totalOrderCount(totalOrderCount)
+                .validOrderCount(validOrderCount)
+                .orderCompletionRate(orderCompletionRate)
+                .build();
+    }
+
+    private Integer getAll(List<Integer> list) {
+        Integer sum = 0;
+
+        for (Integer l : list) sum += l;
+
+        return sum;
+    }
+
+    // 日期计算
+    private void compute(LocalDate begin, LocalDate end, List<LocalDate> dateList) {
+        for (long i = 0; !begin.plusDays(i - 1).equals(end); i++) {
+            dateList.add(begin.plusDays(i));
+        }
     }
 }

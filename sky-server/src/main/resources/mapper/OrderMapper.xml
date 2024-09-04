@@ -70,7 +70,7 @@
             </if>
         </where>
     </select>
-    <select id="getTurnoversBYDates" resultType="java.lang.Double"
+    <select id="getTurnoversByDates" resultType="java.lang.Double"
             parameterType="java.util.List">
         select ifnull(sum(amount), 0) as 'turnover'
         from (
@@ -83,5 +83,19 @@
         where t1.order_time != 'null'
         group by t1.order_time
         order by t1.order_time
+    </select>
+    <select id="getOrderEverydayCount" resultType="java.lang.Integer">
+        select if(t2.order_time is null, 0, count(t2.id)) as `count` from (
+        <foreach collection="dateList" item="date" separator=" " close="select null as time">
+            select #{date} as `time`
+            union all
+        </foreach>
+        ) t1 left join orders t2 on DATE(t2.order_time) = t1.time
+        <if test="status.length > 0">
+            and t2.status = #{status[0]}
+        </if>
+        where t1.time != 'null'
+        group by t1.time
+        order by t1.time
     </select>
 </mapper>

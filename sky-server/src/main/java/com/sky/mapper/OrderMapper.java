@@ -71,5 +71,18 @@ public interface OrderMapper {
     @Select("select * from orders where status = #{status} and order_time < #{time}")
     List<Orders> getByStatusAndOrderTime(Integer status, LocalDateTime time);
 
-    List<Double> getTurnoversBYDates(List<LocalDate> dateList);
+    /**
+     * 统计营业额
+     * @param dateList
+     * @return
+     */
+    List<Double> getTurnoversByDates(List<LocalDate> dateList);
+
+    /**
+     * 每日订单统计
+     * @param dateList
+     * @param status
+     * @return
+     */
+    List<Integer> getOrderEverydayCount(List<LocalDate> dateList, Integer... status);
 }
