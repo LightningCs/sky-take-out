@@ -1,6 +1,7 @@
 package com.sky.mapper;
 
 import com.github.pagehelper.Page;
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderStatisticsVO;
@@ -85,4 +86,14 @@ public interface OrderMapper {
      * @return
      */
     List<Integer> getOrderEverydayCount(List<LocalDate> dateList, Integer... status);
+
+    /**
+     * 获取top10
+     * @param begin
+     * @param end
+     * @param name
+     * @return
+     */
+    @Select("select t2.name, sum(t2.number) as `number` from orders t1 left join order_detail t2 on t1.id = t2.order_id where DATE(t1.order_time) >= #{begin} and DATE(t1.order_time) <= #{end} and status = 5 group by t2.name order by number desc limit 0, 10")
+    List<GoodsSalesDTO> getTop10Goods(LocalDate begin, LocalDate end);
 }
