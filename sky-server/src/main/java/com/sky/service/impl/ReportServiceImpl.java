@@ -104,7 +104,7 @@ public class ReportServiceImpl implements ReportService{
         Integer validOrderCount = getAll(validOrderCountList);
 
         //订单完成率
-        Double orderCompletionRate = validOrderCount.doubleValue() / totalOrderCount;
+        Double orderCompletionRate = totalOrderCount == 0 ? 0 : validOrderCount.doubleValue() / totalOrderCount;
 
         return OrderReportVO.builder()
                 .dateList(StringUtils.join(dateList, ','))
